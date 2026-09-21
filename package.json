@@ -1,0 +1,16 @@
+{
+  "name": "jev-by-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ten small experiments in the decisions between agent steps.",
+  "type": "module",
+  "engines": { "node": ">=20.17.0" },
+  "scripts": {
+    "start": "node src/cli.mjs",
+    "demo": "node src/cli.mjs run all",
+    "test": "node --test",
+    "check": "node --test && node src/cli.mjs run all --check",
+    "docs": "node scripts/docs.mjs"
+  },
+  "license": "MIT"
+}
