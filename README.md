@@ -36,18 +36,18 @@ The input says “For this weekend prototype only, use Python.” The policy kee
 
 ## Pick a problem
 
-| # | Experiment | The interesting edge | What you learn |
-| :-- | :-- | :-- | :-- |
-| 01 | [The helpful agent that went too far](examples/01-permission-drift/) | An allowed tool used for an unrelated purpose | Separate permission from intent |
-| 02 | [When a new memory should not erase an old one](examples/02-memory-reconciliation/) | A temporary exception mistaken for a permanent preference | Reconcile scope before updating memory |
-| 03 | [The release note that outran the evidence](examples/03-evidence-gaps/) | One passing suite becomes a universal reliability claim | Check individual claims against artifacts |
-| 04 | [Almost the same question. Dangerously different answer.](examples/04-semantic-cache-boundary/) | A near-identical query changes tenant or time period | Gate cache reuse beyond similarity |
-| 05 | [HTTP 200 is not task completion](examples/05-tool-result-contract/) | A queued report masquerades as a completed deliverable | Check semantic postconditions |
-| 06 | [The retry that creates a second invoice](examples/06-retry-or-reconcile/) | A timed-out write may already have succeeded | Reconcile unknown outcomes before retrying |
-| 07 | [Spend context on evidence, not repetition](examples/07-context-budget/) | Short, redundant text crowds out a useful trace | Combine relevance, novelty, and a hard budget |
-| 08 | [The handoff that forgot “do not deploy”](examples/08-handoff-readiness/) | Compression loses a prohibition or invents certainty | Preserve obligations across handoffs |
-| 09 | [Same symptom, different bug](examples/09-issue-twins/) | Matching issue titles hide different causes | Suggest relationships without closing issues |
-| 10 | [Does the decision survive a harmless rewrite?](examples/10-question-stress-test/) | Reordered options change a supposedly stable judgment | Test equivalent inputs and a changed-evidence control |
+| # | Experiment | The interesting edge | What you learn | Primitives |
+| :-- | :-- | :-- | :-- | :-- |
+| 01 | [The helpful agent that went too far](examples/01-permission-drift/) | An allowed tool used for an unrelated purpose | Separate permission from intent | Noul |
+| 02 | [When a new memory should not erase an old one](examples/02-memory-reconciliation/) | A temporary exception mistaken for a permanent preference | Reconcile scope before updating memory | Choice, Noul |
+| 03 | [The release note that outran the evidence](examples/03-evidence-gaps/) | One passing suite becomes a universal reliability claim | Check individual claims against artifacts | Noul |
+| 04 | [Almost the same question. Dangerously different answer.](examples/04-semantic-cache-boundary/) | A near-identical query changes tenant or time period | Gate cache reuse beyond similarity | Noul |
+| 05 | [HTTP 200 is not task completion](examples/05-tool-result-contract/) | A queued report masquerades as a completed deliverable | Check semantic postconditions | Noul |
+| 06 | [The retry that creates a second invoice](examples/06-retry-or-reconcile/) | A timed-out write may already have succeeded | Reconcile unknown outcomes before retrying | Choice |
+| 07 | [Spend context on evidence, not repetition](examples/07-context-budget/) | Short, redundant text crowds out a useful trace | Combine relevance, novelty, and a hard budget | Score |
+| 08 | [The handoff that forgot “do not deploy”](examples/08-handoff-readiness/) | Compression loses a prohibition or invents certainty | Preserve obligations across handoffs | Noul |
+| 09 | [Same symptom, different bug](examples/09-issue-twins/) | Matching issue titles hide different causes | Suggest relationships without closing issues | Choice |
+| 10 | [Does the decision survive a harmless rewrite?](examples/10-question-stress-test/) | Reordered options change a supposedly stable judgment | Test equivalent inputs and a changed-evidence control | Choice |
 
 Every example includes a readable policy, contrasting inputs, authored response fixtures, intended outcomes, a deliberately simple baseline, and a known failure mode. The examples return proposals; they do not deploy, publish, mutate a database, close issues, or execute tool calls.
 
