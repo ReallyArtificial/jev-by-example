@@ -51,3 +51,20 @@ test('invalid JSON and malformed responses do not become decisions', async () =>
   await assert.rejects(evaluate(request, { apiKey: 'test', fetchImpl: async () => new Response('not json') }), /invalid JSON/);
   await assert.rejects(evaluate(request, { apiKey: 'test', fetchImpl: async () => json({ ...response, answers: {} }) }), /answer IDs/);
 });
+
+test('--via accepts only loopback http addresses and targets /v1/systemone', async () => {
+  const { viaEndpoint } = await import('../src/client.mjs');
+  assert.equal(viaEndpoint('http://127.0.0.1:8010'), 'http://127.0.0.1:8010/v1/systemone');
+  assert.equal(viaEndpoint('http://localhost:8010/'), 'http://localhost:8010/v1/systemone');
+  assert.throws(() => viaEndpoint('https://127.0.0.1:8010'), /loopback http/);
+  assert.throws(() => viaEndpoint('http://example.com:8010'), /loopback http/);
+  assert.throws(() => viaEndpoint('not a url'), /must be a URL/);
+});
+
+test('evaluate posts to the via endpoint when one is given', async () => {
+  const request = { model: 'jev-1.13.0', state: 'x', questions: { q: { type: 'noul', instructions: 'Yes?' } } };
+  let seen = null;
+  const result = await evaluate(request, { apiKey: 'k', endpoint: 'http://127.0.0.1:8010/v1/systemone', fetchImpl: async (url) => { seen = url; return new Response(JSON.stringify({ model: 'jev-1.13.0', answers: { q: { type: 'noul', noul: 0.9 } }, usage: { input_tokens: 1, output_tokens: 0 } }), { status: 200 }); } });
+  assert.equal(seen, 'http://127.0.0.1:8010/v1/systemone');
+  assert.equal(result.response.answers.q.noul, 0.9);
+});
