@@ -3,13 +3,21 @@ import { validateRequest, validateResponse } from './contract.mjs';
 
 export const ENDPOINT = 'https://api.typesafe.ai/v1/systemone';
 export const DEFAULT_MODEL = 'jev-1.13.0';
-// Fixed official host. No arbitrary base URL that could receive your API key.
+// Fixed official host. The only alternative is a loopback proxy (--via), so the API key never
+// leaves this machine except toward api.typesafe.ai. Used with shadow tools such as stuntdouble.
+export function viaEndpoint(via) {
+  let url;
+  try { url = new URL(via); } catch { throw new Error(`--via must be a URL such as http://127.0.0.1:8010, got: ${via}`); }
+  if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname === '::1' ? '[::1]' : url.hostname)) throw new Error('--via only accepts a loopback http:// address, so your API key stays on this machine.');
+  return `${url.origin}/v1/systemone`;
+}
 export async function evaluate(request, {
   apiKey = process.env.TYPESAFE_API_KEY,
   fetchImpl = globalThis.fetch,
   wait = sleep,
   timeoutMs = 30_000,
   retries = 2,
+  endpoint = ENDPOINT,
 } = {}) {
   validateRequest(request);
   if (typeof apiKey !== 'string' || !apiKey.trim()) throw new Error('Set TYPESAFE_API_KEY in your environment or .env before using --live.');
@@ -17,7 +25,7 @@ export async function evaluate(request, {
   for (let attempt = 0; attempt <= retries; attempt++) {
     let response;
     try {
-      response = await fetchImpl(ENDPOINT, {
+      response = await fetchImpl(endpoint, {
         method: 'POST', redirect: 'error',
         headers: { Authorization: `Bearer ${apiKey.trim()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(request), signal: AbortSignal.timeout(timeoutMs),

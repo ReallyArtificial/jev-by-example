@@ -5,7 +5,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { examples, selectExamples } from './catalog.mjs';
-import { DEFAULT_MODEL } from './client.mjs';
+import { DEFAULT_MODEL, evaluate, viaEndpoint } from './client.mjs';
 import { digest, prepare, runCase, summarize } from './runner.mjs';
 
 const help = `jev-by-example · ten decisions between agent steps
@@ -24,6 +24,8 @@ Default: authored fixtures, no network, no key required.
 --json             Print the complete report as JSON.
 --out FILE         Save a new report; refuses to overwrite an existing file.
 --check            Exit 1 if a result disagrees with its intended outcome.
+--via URL          Send live requests through a loopback proxy (e.g. stuntdouble
+                   at http://127.0.0.1:8010) that forwards them to TypeSafe.
 
 request prints the exact request without making a call. Deterministic preflight
 rejections have no request. request and --live load .env from this repository.
@@ -38,7 +40,7 @@ function parse(args) {
     const key = arg.slice(2);
     if (Object.hasOwn(flags, key)) throw new Error(`Repeated flag: ${arg}`);
     if (['live', 'json', 'check'].includes(key)) flags[key] = true;
-    else if (['case', 'model', 'out'].includes(key)) {
+    else if (['case', 'model', 'out', 'via'].includes(key)) {
       const value = args[++i];
       if (!value || value.startsWith('--')) throw new Error(`Missing value for ${arg}`);
       flags[key] = value;
@@ -81,15 +83,17 @@ async function main() {
     return;
   }
   if (flags.live && !process.env.TYPESAFE_API_KEY?.trim()) throw new Error('Set TYPESAFE_API_KEY in your environment or .env before using --live.');
+  if (flags.via && !flags.live) throw new Error('--via only applies to --live runs.');
+  const endpoint = flags.via ? viaEndpoint(flags.via) : null;
   const outputPath = flags.out ? resolve(flags.out) : null;
   if (outputPath && existsSync(outputPath)) throw new Error(`Report already exists: ${flags.out}. Choose a new filename.`);
   // Fail before making any paid request if the destination cannot be prepared.
   if (outputPath) await mkdir(dirname(outputPath), { recursive: true });
-  if (!flags.json) console.log(flags.live ? `LIVE · ${model} · ${cases.length} cases (some may stop at preflight)` : 'FIXTURE · authored illustrations · no Jev calls · no model accuracy claim');
+  if (!flags.json) console.log(flags.live ? `LIVE · ${model} · ${cases.length} cases (some may stop at preflight)${endpoint ? ` · via ${flags.via}` : ''}` : 'FIXTURE · authored illustrations · no Jev calls · no model accuracy claim');
   const results = [], errors = [];
   for (const { example, c } of cases) {
     try {
-      const result = await runCase(example, c, { live: !!flags.live, model });
+      const result = await runCase(example, c, { live: !!flags.live, model, ...(endpoint ? { client: request => evaluate(request, { endpoint }) } : {}) });
       results.push(result);
       if (!flags.json) {
         console.log(`\n${example.id} / ${c.id}\n  ${result.outcome.action} — ${result.outcome.reason}`);

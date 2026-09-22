@@ -105,6 +105,10 @@ npm start -- run all --out reports/fixture.json --check
 # Run the complete set against Jev and retain the evidence:
 npm start -- run all --live --out reports/live.json --check
 
+# Same, but through a local shadow proxy such as stuntdouble, which forwards to
+# TypeSafe and also asks local models (Kev, Laya) whether they would decide the same:
+npm start -- run all --live --via http://127.0.0.1:8010 --out reports/live-via.json
+
 # Machine-readable stdout without npm's banner:
 node src/cli.mjs run 10 --json
 
