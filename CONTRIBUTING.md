@@ -28,3 +28,7 @@ Add focused tests for new behavior, especially deterministic boundaries and resp
 Official API sources and their verification date live in `docs/api-contract.md`. When changing the client, verify against those primary sources again.
 
 For a contribution, open one focused pull request explaining the decision boundary and what you verified. Disclose substantial AI assistance and distinguish fixture checks from live model observations.
+
+## AI assistance
+
+This org is built by a human and an AI collaborator, and AI-assisted contributions are welcome under the org-wide [AI assistance policy](https://github.com/ReallyArtificial/.github/blob/main/CONTRIBUTING.md#ai-assistance-policy). In short: disclose AI involvement in your pull request, make sure you have personally read and understood every line, write the PR description and review replies yourself, and keep agents away from `good first issue`. A human maintainer signs off on every merge.
